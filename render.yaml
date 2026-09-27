@@ -102,7 +102,7 @@ services:
       # Proxies /api/* server-side to the backend service
       # Set this after the backend deploys — paste the backend URL (e.g. https://rr-group-backend.onrender.com)
       - key: BACKEND_URL
-      value: https://rr-group-backend-6mgc.onrender.com
+        value: https://rr-group-backend-6mgc.onrender.com
 
       # Firebase client config (public — safe)
       - key: NEXT_PUBLIC_FIREBASE_API_KEY
