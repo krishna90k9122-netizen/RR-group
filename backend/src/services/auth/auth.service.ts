@@ -66,10 +66,11 @@ export async function register(input: {
       if ((err as { code?: string }).code === "auth/email-already-exists") {
         throw new AppError(409, "EMAIL_TAKEN", "An account with this email already exists")
       }
-      throw err
+      console.warn("⚠️ Firebase Auth createUser skipped (falling back to Firestore):", (err as Error).message)
+      uid = `usr_${createHash("sha256").update(email + Date.now()).digest("hex").slice(0, 20)}`
     }
   } else {
-    uid = `local_${createHash("sha256").update(email).digest("hex").slice(0, 16)}`
+    uid = `usr_${createHash("sha256").update(email + Date.now()).digest("hex").slice(0, 20)}`
   }
 
   const profile = {

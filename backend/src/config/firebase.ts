@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { cert, getApps, initializeApp } from "firebase-admin/app"
 import { getAuth, type Auth } from "firebase-admin/auth"
 import { getFirestore, type Firestore } from "firebase-admin/firestore"
@@ -15,14 +16,18 @@ export const isFirebaseConfigured = Boolean(
     (clientEmail && privateKey && projectId),
 )
 
+import path from "node:path"
+
 function firebaseAdmin() {
   const existing = getApps()[0]
   if (existing) return existing
 
   let options: Parameters<typeof initializeApp>[0]
   if (process.env.GOOGLE_APPLICATION_CREDENTIALS || serviceAccountPath) {
+    const rawPath = process.env.GOOGLE_APPLICATION_CREDENTIALS ?? serviceAccountPath
+    const resolvedPath = path.isAbsolute(rawPath) ? rawPath : path.resolve(process.cwd(), rawPath)
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    options = { credential: cert(require(process.env.GOOGLE_APPLICATION_CREDENTIALS ?? serviceAccountPath)) }
+    options = { credential: cert(require(resolvedPath)) }
   } else {
     options = {
       credential: cert({

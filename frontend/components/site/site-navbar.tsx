@@ -68,13 +68,15 @@ export function SiteNavbar() {
         </div>
 
         <Link href="/" className="flex items-center gap-2" aria-label="RR GROUP home">
-          <img
-            src="/rrlogo.jpeg"
-            alt="RR GROUP"
-            width={36}
-            height={36}
-            className="size-9 rounded-lg object-contain bg-white p-1"
-          />
+          <div className="relative size-9 overflow-hidden rounded-full border border-[#E9E1D4] bg-[#FFFDF8] p-1.5 shadow-xs flex items-center justify-center">
+            <img
+              src="/assets/rr-mark.png"
+              alt="RR GROUP"
+              width={36}
+              height={36}
+              className="size-full object-contain p-0.5"
+            />
+          </div>
           <span className="flex flex-col leading-none">
             <span className="font-display text-base font-extrabold tracking-tight text-foreground">
               RR GROUP
@@ -93,13 +95,16 @@ export function SiteNavbar() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "relative rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   active
-                    ? "text-primary"
+                    ? "text-primary font-semibold"
                     : "text-foreground/80 hover:bg-muted hover:text-foreground",
                 )}
               >
                 {link.label}
+                {active && (
+                  <span className="absolute -bottom-1 left-2.5 right-2.5 h-0.5 rounded-full bg-primary" />
+                )}
               </Link>
             )
           })}
@@ -221,7 +226,9 @@ export function SiteNavbar() {
             >
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
-                  <img src="/rrlogo.jpeg" alt="RR GROUP" width={36} height={36} className="size-9 rounded-lg object-contain bg-white p-1" />
+                  <div className="relative size-9 overflow-hidden rounded-lg border border-[#E9E1D4] bg-[#FFFDF8] p-1 shadow-xs">
+                    <img src="/assets/rr-mark.png" alt="RR GROUP" width={36} height={36} className="size-full object-contain" />
+                  </div>
                 </span>
                 <Button
                   variant="ghost"

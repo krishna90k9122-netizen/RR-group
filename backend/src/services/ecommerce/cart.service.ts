@@ -1,4 +1,4 @@
-import { COLLECTIONS, findById, getDb, now } from "@/services/db/firestore"
+import { COLLECTIONS, findById, findMany, getDb, now } from "@/services/db/firestore"
 import { AppError } from "@/utils/api"
 
 export interface CartItemRow {
@@ -13,6 +13,42 @@ interface CartDoc {
   id: string
   userId: string
   items?: CartItemRow[]
+}
+
+const PRODUCT_SLUG_MAP: Record<string, string> = {
+  p1: "rr-commerce-erp-pro",
+  p2: "rr-crm-suite-enterprise",
+  p3: "rr-analytics-cloud",
+  p4: "corporate-website-kit",
+  p5: "analytics-dashboard-template",
+  p6: "smartpos-terminal-x1",
+  p7: "barcode-scanner-pro",
+  p8: "iot-sensor-kit",
+  p9: "cloud-backup-1tb",
+  p10: "email-marketing-suite",
+  p11: "seo-optimizer-toolkit",
+  p12: "usb-c-hub-station",
+  p13: "wireless-presenter",
+}
+
+async function findProduct(productIdOrSlug: string) {
+  if (!productIdOrSlug) return null
+  let product = await findById<Record<string, unknown> & { id: string }>(COLLECTIONS.products, productIdOrSlug)
+  if (product) return product
+
+  const mapped = PRODUCT_SLUG_MAP[productIdOrSlug]
+  if (mapped) {
+    product = await findById<Record<string, unknown> & { id: string }>(COLLECTIONS.products, mapped)
+    if (product) return product
+  }
+
+  const bySlug = await findMany<Record<string, unknown> & { id: string }>(COLLECTIONS.products, {
+    where: [{ field: "slug", op: "==", value: productIdOrSlug }],
+    limit: 1,
+  })
+  if (bySlug.length) return bySlug[0]
+
+  return null
 }
 
 function itemKey(productId: string, variantId?: string | null) {
@@ -37,7 +73,7 @@ async function loadCart(userId: string): Promise<CartDoc> {
 async function enrich(cart: CartDoc) {
   const items: { id: string; productId: string; variantId?: string | null; name: string; slug: string; sku?: string; image?: string; price: number; originalPrice?: number | null; variantLabel?: string; variantName?: string; quantity: number; stock: number; stockStatus: string }[] = []
   for (const item of cart.items ?? []) {
-    const product = await findById<Record<string, unknown> & { id: string }>(COLLECTIONS.products, item.productId)
+    const product = await findProduct(item.productId)
     if (!product) continue
     const variant = Array.isArray(product.variants)
       ? (product.variants as { id?: string; value?: string; name?: string; price?: unknown; sku?: unknown; available?: boolean }[]).find(
@@ -80,10 +116,12 @@ export async function getCart(userId: string) {
 }
 
 export async function addToCart(userId: string, item: { productId: string; variantId?: string | null; quantity: number }) {
-  const product = await findById<Record<string, unknown> & { id: string }>(COLLECTIONS.products, item.productId)
+  const product = await findProduct(item.productId)
   if (!product || product.isActive === false) {
     throw new AppError(404, "NOT_FOUND", "Product not found")
   }
+
+  const canonicalId = String(product.id)
 
   if (item.variantId) {
     const variants = Array.isArray(product.variants) ? (product.variants as { id?: string; available?: boolean }[]) : []
@@ -100,7 +138,7 @@ export async function addToCart(userId: string, item: { productId: string; varia
 
   const cart = await loadCart(userId)
   const items = cart.items ?? []
-  const key = itemKey(item.productId, item.variantId)
+  const key = itemKey(canonicalId, item.variantId)
   const existing = items.find((i) => i.id === key)
 
   if (existing) {
@@ -116,7 +154,7 @@ export async function addToCart(userId: string, item: { productId: string; varia
         ...items,
         {
           id: key,
-          productId: item.productId,
+          productId: canonicalId,
           variantId: item.variantId ?? null,
           quantity: item.quantity,
           createdAt: now(),

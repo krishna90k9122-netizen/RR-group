@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, Minus, Plus, ShoppingBag, Tag, Trash2, X } from "lucide-react"
+import { ArrowLeft, ArrowRight, Minus, Plus, ShoppingBag, Tag, Trash2, X } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useStore, formatPrice } from "@/components/store/store-provider"
@@ -35,16 +35,40 @@ export default function CartPage() {
         <p className="mt-2 text-muted-foreground">
           Looks like you haven&apos;t added anything yet. Explore our best sellers to get started.
         </p>
-        <Link href="/shop/products" className={cn(buttonVariants({ size: "lg" }), "mt-8 h-11 px-6")}>
-          Start shopping
-          <ArrowRight className="size-4" />
-        </Link>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link href="/shop" className={cn(buttonVariants({ size: "default" }), "h-11 px-6")}>
+            Start shopping
+            <ArrowRight className="size-4" />
+          </Link>
+          <Link href="/" className={cn(buttonVariants({ variant: "outline", size: "default" }), "h-11 px-6")}>
+            <ArrowLeft className="size-4" />
+            Back to Home
+          </Link>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10">
+    <div className="mx-auto max-w-7xl px-4 py-8">
+      {/* Back Navigation Bar */}
+      <div className="mb-6 flex items-center justify-between">
+        <Link
+          href="/shop"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-semibold text-foreground/80 shadow-xs transition hover:bg-[#1769FF] hover:text-white hover:border-[#1769FF]"
+        >
+          <ArrowLeft className="size-3.5" />
+          <span>Continue Shopping</span>
+        </Link>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-semibold text-foreground/80 shadow-xs transition hover:bg-[#1769FF] hover:text-white hover:border-[#1769FF]"
+        >
+          <ArrowLeft className="size-3.5" />
+          <span>Back to Home</span>
+        </Link>
+      </div>
+
       <h1 className="font-display text-3xl font-bold tracking-tight text-foreground">Your cart</h1>
       <p className="mt-1 text-sm text-muted-foreground">{cart.length} items in your cart</p>
 

@@ -79,7 +79,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }, 3000)
   }, [])
 
-  // Hydrate from server when authenticated, clear on logout
+  // Hydrate from server when authenticated, or from localStorage for guests
   const refreshFromServer = useCallback(async () => {
     if (!isAuthenticated) return
     try {
@@ -94,36 +94,44 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated])
 
-  const doHydrate = useCallback(() => {
-    if (isAuthenticated) refreshFromServer()
-    else {
-      setCart([])
-      setWishlist([])
+  // Load guest cart on mount
+  useEffect(() => {
+    if (!isAuthenticated) {
+      try {
+        const stored = localStorage.getItem("rr_guest_cart")
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          if (Array.isArray(parsed) && parsed.length > 0) setCart(parsed)
+        }
+      } catch {
+        // ignore
+      }
+    } else {
+      refreshFromServer()
     }
   }, [isAuthenticated, refreshFromServer])
 
+  // Save guest cart changes to localStorage
   useEffect(() => {
-    doHydrate()
-  }, [doHydrate])
+    if (!isAuthenticated && cart.length > 0) {
+      try {
+        localStorage.setItem("rr_guest_cart", JSON.stringify(cart))
+      } catch {
+        // ignore
+      }
+    }
+  }, [cart, isAuthenticated])
 
   const addToCart = useCallback(
     async (product: Product, quantity = 1, variant?: string) => {
-      if (isAuthenticated) {
-        try {
-          const updated = await addToServerCart({ productId: product.id, quantity, variantId: variant })
-          setCart(mapApiCartToItems(updated as unknown as { items?: unknown[] }))
-          toast(`${product.name} added to cart`)
-          return
-        } catch {
-          toast("Failed to add to cart", "error")
-          return
-        }
-      }
+      const targetId = product.slug || product.id
       setCart((prev) => {
-        const existing = prev.find((i) => i.productId === product.id && i.variant === variant)
+        const existing = prev.find(
+          (i) => (i.productId === product.id || i.productId === product.slug) && i.variant === variant,
+        )
         if (existing) {
           return prev.map((i) =>
-            i.productId === product.id && i.variant === variant
+            (i.productId === product.id || i.productId === product.slug) && i.variant === variant
               ? { ...i, quantity: i.quantity + quantity }
               : i,
           )
@@ -131,10 +139,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return [
           ...prev,
           {
-            productId: product.id,
+            productId: targetId,
             slug: product.slug,
             name: product.name,
-            image: product.images[0],
+            image: product.images?.[0] || "/placeholder.svg",
             price: product.price,
             originalPrice: product.originalPrice,
             variant,
@@ -144,6 +152,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         ]
       })
       toast(`${product.name} added to cart`)
+
+      if (isAuthenticated) {
+        try {
+          const updated = await addToServerCart({ productId: targetId, quantity, variantId: variant })
+          if (updated && (updated as { items?: unknown[] }).items) {
+            setCart(mapApiCartToItems(updated as unknown as { items?: unknown[] }))
+          }
+        } catch (e) {
+          console.warn("Server cart sync error:", e)
+        }
+      }
     },
     [toast, isAuthenticated],
   )

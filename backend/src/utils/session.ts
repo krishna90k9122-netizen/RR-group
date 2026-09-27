@@ -18,7 +18,9 @@ export function signAccessToken(payload: SessionPayload): string {
 export function verifyAccessToken(token: string): SessionPayload | null {
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload
-    return { userId: decoded.userId, role: decoded.role }
+    const rawUserId = decoded.userId || decoded.id || decoded.sub
+    if (!rawUserId || typeof rawUserId !== "string" || !rawUserId.trim()) return null
+    return { userId: rawUserId.trim(), role: decoded.role || "CUSTOMER" }
   } catch {
     return null
   }
@@ -54,7 +56,7 @@ export async function invalidateSession(token: string) {
 
 export async function validateSession(token: string): Promise<(SessionPayload & { email: string }) | null> {
   const payload = verifyAccessToken(token)
-  if (!payload) return null
+  if (!payload || !payload.userId) return null
 
   const user = await findById<{
     id: string
@@ -62,7 +64,7 @@ export async function validateSession(token: string): Promise<(SessionPayload & 
     role: string
     isActive: boolean
   }>("users", payload.userId)
-  if (!user || !user.isActive) return null
+  if (!user || user.isActive === false) return null
 
   const session = await getDb()
     .collection("sessions")

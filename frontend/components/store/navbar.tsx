@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { AnimatePresence, motion } from "motion/react"
 import { Heart, LayoutDashboard, LogOut, Menu, Search, ShoppingCart, User, X } from "lucide-react"
@@ -23,9 +24,15 @@ const navLinks = [
 function Logo() {
   return (
     <Link href="/shop" className="flex items-center gap-2" aria-label="RR GROUP home">
-      <span className="flex size-9 items-center justify-center rounded-lg bg-primary font-display text-sm font-bold tracking-tight text-primary-foreground">
-        RR
-      </span>
+      <div className="relative size-9 overflow-hidden rounded-full border border-[#E9E1D4] bg-[#FFFDF8] p-1.5 shadow-xs flex items-center justify-center">
+        <Image
+          src="/assets/rr-mark.png"
+          alt="RR GROUP"
+          fill
+          className="object-contain p-0.5"
+          sizes="36px"
+        />
+      </div>
       <span className="flex flex-col leading-none">
         <span className="font-display text-base font-extrabold tracking-tight text-foreground">
           RR GROUP

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { CreditCard, LayoutDashboard, LifeBuoy, MapPin, Package, Settings, ShieldCheck } from "lucide-react"
+import { ArrowLeft, CreditCard, LayoutDashboard, LifeBuoy, MapPin, Package, Settings, ShieldCheck } from "lucide-react"
 import { useAuth } from "@/components/providers/auth-provider"
 import { cn } from "@/lib/utils"
 
@@ -51,6 +51,16 @@ export function DashboardNav() {
           Admin Panel
         </Link>
       )}
+
+      <div className="my-2 border-t border-border/60" />
+
+      <Link
+        href="/"
+        className="flex items-center gap-2.5 whitespace-nowrap rounded-lg border border-dashed border-[#E9E1D4] bg-white px-3 py-2 text-sm font-semibold text-[#1769FF] shadow-2xs transition hover:bg-[#EAF3FF] hover:border-[#1769FF]/50"
+      >
+        <ArrowLeft className="size-4" />
+        Back to Home Page
+      </Link>
     </nav>
   )
 }

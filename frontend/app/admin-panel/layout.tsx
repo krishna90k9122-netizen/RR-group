@@ -8,7 +8,9 @@ export default function AdminPanelLayout({ children }: { children: ReactNode }) 
         <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a0f]/80 backdrop-blur-md">
           <div className="flex h-14 items-center justify-between gap-4 px-6">
             <div className="flex items-center gap-3">
-              <img src="/rrlogo.jpeg" alt="RR GROUP" width={32} height={32} className="size-8 rounded-lg object-contain bg-white p-1" />
+              <div className="relative size-8 overflow-hidden rounded-lg border border-white/20 bg-white/10 p-0.5 shadow-xs">
+                <img src="/assets/rr-mark.png" alt="RR GROUP" width={32} height={32} className="size-full object-contain" />
+              </div>
               <div className="leading-tight">
                 <p className="text-sm font-bold tracking-tight text-white">RR GROUP — Admin Panel</p>
                 <p className="text-[11px] uppercase tracking-widest text-white/50">Separate Command Center · Live Tracking</p>

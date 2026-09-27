@@ -71,15 +71,20 @@ export function Footer() {
     <footer className="mt-auto border-t border-border bg-card">
       <div className="mx-auto max-w-7xl px-4 py-12">
         {/* Newsletter */}
-        <div className="mb-12 flex flex-col items-start justify-between gap-6 rounded-2xl bg-primary p-8 text-primary-foreground md:flex-row md:items-center">
-          <div className="max-w-md">
-            <h2 className="font-display text-2xl font-bold">Stay in the loop</h2>
-            <p className="mt-1 text-sm text-primary-foreground/80">
+        <div className="relative overflow-hidden mb-12 flex flex-col items-start justify-between gap-6 rounded-[24px] bg-gradient-to-r from-[#2563EB] via-[#1D4ED8] to-[#1E40AF] p-6 sm:p-8 text-white shadow-[0_12px_32px_rgba(37,99,235,0.2)] md:flex-row md:items-center">
+          {/* Subtle grid/curve pattern */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"
+          />
+          <div className="relative max-w-md">
+            <h2 className="font-display text-2xl font-bold tracking-tight text-white">Stay in the loop</h2>
+            <p className="mt-1 text-sm text-white/80">
               Product launches, exclusive deals and business tips — straight to your inbox.
             </p>
           </div>
           <form
-            className="flex w-full max-w-md gap-2"
+            className="relative flex w-full max-w-md flex-col gap-2 sm:flex-row sm:items-center"
             onSubmit={async (e) => {
               e.preventDefault()
               const email = new FormData(e.currentTarget).get("email")?.toString() ?? ""
@@ -98,9 +103,12 @@ export function Footer() {
               required
               placeholder="you@company.com"
               aria-label="Email address"
-              className="border-transparent bg-primary-foreground text-foreground"
+              className="h-11 rounded-full border border-white/20 bg-white/95 px-4 text-sm text-[#0F1B36] placeholder:text-[#53627A] shadow-inner outline-none focus-visible:ring-2 focus-visible:ring-white"
             />
-            <Button type="submit" variant="secondary">
+            <Button
+              type="submit"
+              className="h-11 shrink-0 rounded-full bg-white px-6 font-semibold text-[#0F1B36] shadow-sm hover:bg-[#F9FAFB] hover:text-[#2563EB] transition-colors"
+            >
               Subscribe
             </Button>
           </form>
@@ -109,7 +117,9 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
           <div className="col-span-2">
             <Link href="/shop" className="flex items-center gap-2">
-              <img src="/rrlogo.jpeg" alt="RR GROUP" width={36} height={36} className="size-9 rounded-lg object-contain bg-white p-1" />
+              <div className="relative size-9 overflow-hidden rounded-lg border border-[#E9E1D4] bg-[#FFFDF8] p-1 shadow-xs">
+                <img src="/assets/rr-mark.png" alt="RR GROUP" width={36} height={36} className="size-full object-contain" />
+              </div>
               <span className="font-display text-lg font-extrabold tracking-tight text-foreground">
                 RR GROUP
               </span>
